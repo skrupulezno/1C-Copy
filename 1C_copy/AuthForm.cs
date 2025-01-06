@@ -120,26 +120,9 @@ namespace _1C_copy
 
             if (rowsAffected > 0)
             {
-                MessageBox.Show("Регистрация прошла успешно!");
-                string role = checkResult.Rows[0]["role"].ToString();
-                int userId = Convert.ToInt32(checkResult.Rows[0]["user_id"]);
-                MessageBox.Show($"Вход выполнен успешно! Ваша роль: {role}");
 
-                switch (role)
-                {
-                    case "admin":
-                        OpenAdminForm(userId);
-                        break;
-                    case "teacher":
-                        OpenTeacherForm(userId);
-                        break;
-                    case "student":
-                        OpenStudentForm(userId);
-                        break;
-                    default:
-                        MessageBox.Show("Неизвестная роль.");
-                        break;
-                }
+                MessageBox.Show($"Успешная регистрация!");
+
             }
             else
             {
