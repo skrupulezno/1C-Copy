@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
+using Mysqlx.Session;
 using MySqlX.XDevAPI.Common;
 
 namespace _1C_copy
@@ -81,6 +82,9 @@ namespace _1C_copy
                     case "student":
                         OpenStudentForm(userId);
                         break;
+                    case "guest":
+                        OpenGuestForm();
+                        break;
                     default:
                         MessageBox.Show("Неизвестная роль.");
                         break;
@@ -120,10 +124,10 @@ namespace _1C_copy
 
             if (rowsAffected > 0)
             {
+                
+                OpenGuestForm();
 
-                MessageBox.Show($"Успешная регистрация!");
-
-            }
+                }
             else
             {
                 MessageBox.Show("Ошибка при регистрации.");
@@ -149,6 +153,18 @@ namespace _1C_copy
             StudentForm studentForm = new StudentForm(userId, sqlAdapter);
             studentForm.Show();
             this.Hide();
+        }
+
+        private void OpenGuestForm()
+        {
+            GuestForm guestForm = new GuestForm();
+            guestForm.Show();
+            this.Hide();
+        }
+
+        private void lblPassword_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
