@@ -18,6 +18,7 @@ namespace _1C_copy
 
         private void AdminForm_Load(object sender, EventArgs e)
         {
+            InitializeDataGridViewStudents();
             LoadGuests();
             LoadTeachers();
             LoadSubjects();
@@ -42,6 +43,47 @@ namespace _1C_copy
             dataGridViewTeachers.DataSource = result;
         }
 
+        private void InitializeDataGridViewStudents()
+        {
+            dataGridViewStudents.AutoGenerateColumns = false;
+            dataGridViewStudents.Columns.Clear();
+
+            dataGridViewStudents.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "user_id",
+                HeaderText = "User ID",
+                Name = "user_id"
+            });
+
+            dataGridViewStudents.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "full_name",
+                HeaderText = "Full Name",
+                Name = "full_name"
+            });
+
+            dataGridViewStudents.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "email",
+                HeaderText = "Email",
+                Name = "email"
+            });
+
+            dataGridViewStudents.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "average_grade",
+                HeaderText = "Average Grade",
+                Name = "average_grade"
+            });
+
+            dataGridViewStudents.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "grade_count",
+                HeaderText = "Grade Count",
+                Name = "grade_count"
+            });
+        }
+
         private void LoadSubjects()
         {
             string query = "SELECT * FROM Subjects";
@@ -52,18 +94,26 @@ namespace _1C_copy
         private void LoadStudents()
         {
             string query = @"
-                SELECT U.user_id, U.full_name, U.email, S.subject_name, G.grade 
-                FROM Users U
-                LEFT JOIN Grades G ON U.user_id = G.student_id
-                LEFT JOIN Subjects S ON G.subject_id = S.subject_id
-                WHERE U.role='student'";
+        SELECT 
+            U.user_id, 
+            U.full_name, 
+            U.email, 
+            AVG(G.grade) AS average_grade, 
+            COUNT(G.grade) AS grade_count
+        FROM Users U
+        LEFT JOIN Grades G ON U.user_id = G.student_id
+        WHERE U.role='student'
+        GROUP BY U.user_id, U.full_name, U.email
+        HAVING COUNT(G.grade) > 0";
+
             var result = sqlAdapter.ExecuteQuery(query);
             dataGridViewStudents.DataSource = result;
         }
 
         private void dataGridViewGuests_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+   
+            if (e.RowIndex >= 0 && dataGridViewGuests.Rows[e.RowIndex].Cells["user_id"].Value != null)
             {
                 DataGridViewRow row = dataGridViewGuests.Rows[e.RowIndex];
                 int userId = Convert.ToInt32(row.Cells["user_id"].Value);
@@ -76,11 +126,16 @@ namespace _1C_copy
                 btnAssignRole.Visible = true;
                 btnAssignRole.Tag = userId;
             }
+            else
+            {
+                comboBoxRole.Visible = false;
+                btnAssignRole.Visible = false;
+            }
         }
 
         private void btnAssignRole_Click(object sender, EventArgs e)
         {
-            if (comboBoxRole.SelectedItem != null && btnAssignRole.Tag != null)
+            if (comboBoxRole.SelectedItem != null && btnAssignRole.Tag != null && (int)btnAssignRole.Tag != 0)
             {
                 int userId = (int)btnAssignRole.Tag;
                 string newRole = comboBoxRole.SelectedItem.ToString();
@@ -130,7 +185,8 @@ namespace _1C_copy
 
         private void dataGridViewSubjects_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+
+            if (e.RowIndex >= 0 && dataGridViewSubjects.Rows[e.RowIndex].Cells["subject_id"].Value != null)
             {
                 DataGridViewRow row = dataGridViewSubjects.Rows[e.RowIndex];
                 int subjectId = Convert.ToInt32(row.Cells["subject_id"].Value);
@@ -151,6 +207,12 @@ namespace _1C_copy
                 comboBoxTeachers.Visible = true;
                 btnAssignTeacher.Visible = true;
                 btnAssignTeacher.Tag = subjectId;
+            }
+            else
+            {
+    
+                comboBoxTeachers.Visible = false;
+                btnAssignTeacher.Visible = false;
             }
         }
 
@@ -213,6 +275,31 @@ namespace _1C_copy
             {
                 return Text;
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            LoadGuests();
+            LoadTeachers();
+            LoadSubjects();
+            LoadStudents();
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            AuthForm authForm = new AuthForm();
+            authForm.Show();
+            this.Hide();
         }
     }
 }
